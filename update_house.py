@@ -75,11 +75,12 @@ def get_all_elements():
     # 获取编号列表
     xpath_pattern = '//*[re:match(@content-desc, "^编号.*")]'
     number_elements = d.xpath(xpath_pattern).all()
+    is_last_element = False
     if number_elements:
         # number_elements[0].attrib['content-desc']
         for i in range(0, 500):
             house_key = number_elements[0].attrib['content-desc']
-            print(f'房源编号{house_key}，第{i+1}个')
+            print(f'房源编号{house_key}，第{i + 1}个')
             operate_on_number_element(number_elements[0])
             while True:
                 d.swipe(0.5, 0.8, 0.5, 0.7)  # 上划操作
@@ -87,29 +88,32 @@ def get_all_elements():
                 if number_elements[0].attrib['content-desc'] != house_key:
                     break
                 if d.xpath('//*[@content-desc="没有更多了"]').exists:
+                    print('列表到底了')
+                    is_last_element = True
                     break
-    if len(number_elements) > 1:
-        operate_on_number_element(number_elements[1])
-    if len(number_elements) > 2:
-        operate_on_number_element(number_elements[2])
+            if is_last_element:
+                break
+    for i in range(0, len(number_elements)):
+        print(f'最后第{i+1}个：{number_elements[i].attrib["content-desc"]}')
+        operate_on_number_element(number_elements[i])
 
 
 def test2():
     d.swipe(0.5, 0.8, 0.5, 0.7)
     time.sleep(3)
     # 查找包含指定文本的元素
-    element = d.xpath("编号：1")
+    element = d.xpath('//*[@content-desc="没有更多了"]')
 
     if element.exists:
-        print('click')
-        # 获取元素的中心坐标
-        x, y = element.center()
-
-        # 计算元素下方50像素处的坐标
-        new_y = y + 90
-
-        # 点击新坐标位置
-        d.click(x, new_y)
+        print('存在')
+        # # 获取元素的中心坐标
+        # x, y = element.center()
+        #
+        # # 计算元素下方50像素处的坐标
+        # new_y = y + 90
+        #
+        # # 点击新坐标位置
+        # d.click(x, new_y)
     else:
         print("未找到包含指定文本的元素")
 
